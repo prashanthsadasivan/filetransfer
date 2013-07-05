@@ -1,0 +1,75 @@
+{{set . "title" "Home"}}
+{{template "header.html" .}}
+
+<input  id="thefile" type="file">
+<div id="btn" >
+    click me
+</div>
+
+<script type="text/javascript">
+    function read_slice(file) {
+        var sizeLeft = file.size -1 ;
+        var marker = 0;
+        var chunk = 1024;
+        var continueUploading = true;
+        while(continueUploading) {
+            reader = new FileReader();
+            reader.onloadend = onloadend;
+            var sizeToUpload = sizeLeft < chunk ? sizeLeft : chunk;
+            sizeLeft = sizeLeft - sizeToUpload;
+            if(sizeLeft <= 0) {
+                continueUploading = false;
+            } 
+            var bl = file.slice(marker, marker + sizeToUpload);
+            marker += sizeToUpload;
+            deliver_slice(bl)
+        }
+    }
+function deliver_slice(data)
+{
+        return socket.send(data);
+}
+function onloadend(event) { 
+    if(deliver_slice(event.target.result) == false) {
+        console.log("failed")
+    } else {
+        console.log("wecool")
+    }
+}
+// Create a socket
+var socket = new WebSocket('ws://'+window.location.host+'/SendChunk')
+socket.binaryType = "blob"
+
+// Message received on the socket
+socket.onmessage = function(event) {
+    if(event.data == "ready") {
+        read_slice(global_file)
+    }
+}
+var global_file;  
+
+function convertToBnary(str) {
+    for (var i = 0; i < str.length; ++i)
+    {
+        var bytes = [];
+        bytes.push(str.charCodeAt(i));
+    }
+}
+
+$(
+        function() {
+        $("#thefile").bind( 'change',
+            function(e) { 
+            console.log("setting global file")
+            global_file = e.target.files[0];
+            }
+            )
+        $("#btn").click(function(e) { 
+            socket.send("filename|" + global_file.name)
+            socket.send("numChunks|" + (parseInt(global_file.size / 1024) + (global_file.size % 1024 == 0 ? 0 : 1)))
+            })
+        }
+ )
+
+</script>
+{{template "footer.html" .}}
