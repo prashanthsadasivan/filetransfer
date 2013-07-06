@@ -1,23 +1,17 @@
 {{set . "title" "Home"}}
 {{template "header.html" .}}
-
-<header class="hero-unit" style="background-color:#A9F16C">
-  <div class="container">
-    <div class="row">
-      <div class="hero-text">
-        <h1>It works!</h1>
-        <p></p>
-      </div>
-    </div>
-  </div>
-</header>
-
-<div class="container">
-  <div class="row">
-    <div class="span6">
-      {{template "flash.html" .}}
-    </div>
-  </div>
+<div id="content">
+    <h1> What do you want to do? </h1>
+    <a href="/Sender">
+        <div id="imasender" class="left w50">
+            <h2>Send a file </h2>
+        </div>
+    </a>
+    <a href="/StartReceiver">
+        <div id="imareceiver" class="left w50">
+            <h2> Receive a file </h2>
+        </div>
+    </a>
 </div>
 
 {{template "footer.html" .}}

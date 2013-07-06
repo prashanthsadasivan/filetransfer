@@ -1,40 +1,43 @@
 {{set . "title" "Home"}}
 {{template "header.html" .}}
 
-<input  id="thefile" type="file">
-<div id="btn" >
-    click me
+
+<div id="filetransfer">
+    <span class="blueheader" ><h2> Choose a file to send </h2></span>
+    <!--
+    gonna be used later to make identifiers possibly
+    <p>
+    <label for="identifier">Enter a secret here </label>
+    <input id="identifier" type="text">
+    </p>
+    -->
+    <p>
+    <input id="thefile" name="thefile"type="file">
+    </p>
+    <p>
+    <div id="upfilebtn" class="abtn greenbtn">
+        choose a file
+    </div>
+    </p>
+    <div id="readybtn" class="abtn greenbtn" >
+        click me
+    </div>
 </div>
 
 <script type="text/javascript">
-    function read_slice(file) {
-        var sizeLeft = file.size -1 ;
-        var marker = 0;
-        var chunk = 1024;
-        var continueUploading = true;
-        while(continueUploading) {
-            reader = new FileReader();
-            reader.onloadend = onloadend;
-            var sizeToUpload = sizeLeft < chunk ? sizeLeft : chunk;
-            sizeLeft = sizeLeft - sizeToUpload;
-            if(sizeLeft <= 0) {
-                continueUploading = false;
-            } 
-            var bl = file.slice(marker, marker + sizeToUpload);
-            marker += sizeToUpload;
-            deliver_slice(bl)
-        }
+    function read_slice(file, chunkNum) {
+        var chunk = 131072;
+        var marker = chunkNum*chunk;
+        var sizeLeft = file.size - (marker) - 1;
+        //console.log("sl: " + sizeLeft + " cn: " + chunkNum)
+        var sizeToUpload = sizeLeft < chunk ? sizeLeft : chunk;
+        var bl = file.slice(marker, marker + sizeToUpload);
+        deliver_slice(bl)
     }
 function deliver_slice(data)
 {
-        return socket.send(data);
-}
-function onloadend(event) { 
-    if(deliver_slice(event.target.result) == false) {
-        console.log("failed")
-    } else {
-        console.log("wecool")
-    }
+    //console.log("delivering slice" + data.size)
+    return socket.send(data);
 }
 // Create a socket
 var socket = new WebSocket('ws://'+window.location.host+'/SendChunk')
@@ -42,9 +45,19 @@ socket.binaryType = "blob"
 
 // Message received on the socket
 socket.onmessage = function(event) {
-    if(event.data == "ready") {
-        read_slice(global_file)
+    var msg = event.data.split('|')
+    if(msg[0]== "ready") {
+        read_slice(global_file, 0)
+    } else if(msg[0] == "next") {
+        read_slice(global_file, parseInt(msg[1]))
+    } else if(msg[0] == "end") {
+        //close the websocket??
+
     }
+}
+// Log errors
+socket.onerror = function (error) {
+      console.log('WebSocket Error ' + error);
 }
 var global_file;  
 
@@ -58,15 +71,21 @@ function convertToBnary(str) {
 
 $(
         function() {
+
         $("#thefile").bind( 'change',
             function(e) { 
             console.log("setting global file")
             global_file = e.target.files[0];
+            $("#upfilebtn").text("upload " + global_file.name);
             }
             )
-        $("#btn").click(function(e) { 
+        $("#upfilebtn").click(function(e) {
+            $("input[name=thefile]").trigger('click')
+            });
+        $("#readybtn").click(function(e) { 
+            var numChunks = (parseInt(global_file.size / 131072) + (global_file.size % 131072== 0 ? 0 : 1));
             socket.send("filename|" + global_file.name)
-            socket.send("numChunks|" + (parseInt(global_file.size / 1024) + (global_file.size % 1024 == 0 ? 0 : 1)))
+            socket.send("numChunks|" + numChunks)
             })
         }
  )

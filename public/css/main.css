@@ -1,0 +1,113 @@
+#content {
+    height: 300px;
+    width: 960px;
+    line-height: 300px;
+    vertical-align: middle;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin:-150px 0 0 -480px;
+    z-index: 15;
+    text-align:center;
+}
+
+#content a{
+    text-decoration: none;
+}
+
+#content #imasender {
+    text-align: center;
+    background-color: #8FBE00;
+    color: #F9F2E7;
+    height: 300px;
+    line-height: 300px;
+    vertical-align: middle;
+}
+#content #imasender h2 {
+    line-height: 300px;
+}
+
+#content #imareceiver {
+    text-align: center;
+    background-color: #40C0CB;
+    color: #F9F2E7;
+    height: 300px;
+    line-height: 300px;
+    vertical-align: middle;
+    position: relative;
+}
+
+#content #imareceiver h2 {
+    line-height: 300px;
+}
+
+
+.left {
+    float: left;
+}
+
+.w50 {
+    width: 50%;
+}
+
+
+#filetransfer {
+    width:960px;
+    vertical-align: middle;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin:-150px 0 0 -480px;
+    z-index: 15;
+    text-align:center;
+}
+
+#filetransfer .abtn {
+    display: inline-block;
+    border-radius: 3px;
+    font-weight: bold;
+    color: #F9F2E7;
+    padding: 10px 20px;
+    vertical-align: middle;
+}
+
+
+#file {
+    background-color: #236419;
+}
+
+#thefile {
+    display: none;
+}
+
+.greenbtn {
+    background-color: #8FBE00;
+}
+
+.greenbtn:hover {
+    background-color: #AEE239;
+    cursor: pointer;
+}
+.greenbtn:active {
+    color: #F9F2E7;
+    background-color: #8FBE00;
+}
+.bluebtn {
+    background-color: #40C0CB;
+}
+
+.bluebtn:hover {
+    background-color: #00A8C6;
+    cursor: pointer;
+}
+.bluebtn:active {
+    color: #F9F2E7;
+    background-color: #40C0CB;
+}
+
+.blueheader {
+    color: #40C0CB;
+}
+.greenheader {
+    color: #8FBE00;
+}
