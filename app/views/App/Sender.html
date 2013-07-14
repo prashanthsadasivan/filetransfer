@@ -22,6 +22,7 @@
     <div id="readybtn" class="abtn greenbtn" >
         click me
     </div>
+    <h2><span class="blueheader" id="key"></span><h2>
 </div>
 
 <script type="text/javascript">
@@ -52,9 +53,11 @@ socket.onmessage = function(event) {
         read_slice(global_file, parseInt(msg[1]))
     } else if(msg[0] == "end") {
         //close the websocket??
-
+    } else if(msg[0] == "key") {
+        $("#key").text("Tell the recipient this secret: " + msg[1])
     }
 }
+
 // Log errors
 socket.onerror = function (error) {
       console.log('WebSocket Error ' + error);

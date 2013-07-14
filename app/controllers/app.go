@@ -31,6 +31,7 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
     var tc *transfer.TransferConnection
     for {
         err := websocket.Message.Receive(ws, &data)
+        fmt.Printf("received msg")
         if err != nil {
             fmt.Printf(err.Error())
             return nil
@@ -45,7 +46,9 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
                 if arr[0] == "filename" {
                     filename = arr[1]
                     if numChunks > 0 {
-                        tc = transfer.TheBookKeeper.GetTransferForKey(filename)
+                        key := transfer.GetKeyForFilename(filename)
+                        websocket.Message.Send(ws, "key|" + key)
+                        tc = transfer.TheBookKeeper.GetTransferForKey(key)
                         tc.ReadySend(numChunks, filename)
                         websocket.Message.Send(ws, "ready|ready")
                     }
@@ -53,7 +56,9 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
                 } else if arr[0] == "numChunks" {
                     numChunks,err = strconv.ParseInt(arr[1], 10, 32)
                     if filename != "" {
-                        tc = transfer.TheBookKeeper.GetTransferForKey(filename)
+                        key := transfer.GetKeyForFilename(filename)
+                        websocket.Message.Send(ws, "key|" + key)
+                        tc = transfer.TheBookKeeper.GetTransferForKey(key)
                         tc.ReadySend(numChunks, filename)
                         websocket.Message.Send(ws, "ready|ready")
                     }

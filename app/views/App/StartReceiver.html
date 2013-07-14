@@ -3,7 +3,7 @@
 <div id="filetransfer">
     <span class="greenheader" ><h2> Receive File </h2></span>
     <p>
-    <label for="identifier">Enter the filename here </label>
+    <label for="identifier">Enter the secret here</label>
     <input id="identifier" name="secret"type="text">
     </p>
     <div id="readybtn" class="abtn bluebtn" >
@@ -18,7 +18,7 @@
                 if(filename == null || filename == "") {
                     alert("dawg you need to enter a filename!")
                 }
-                window.location.href = "/Receiver?key=" + $("input[name=secret]").val();
+                window.open("/Receiver?key=" + $("input[name=secret]").val(), "download");
                 })
             })
 

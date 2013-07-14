@@ -6,6 +6,7 @@ import (
     "time"
     "sync"
     "fmt"
+    "crypto/md5"
 )
 
 
@@ -39,6 +40,7 @@ func (bk *BookKeeper) GetTransferForKey(key string) *TransferConnection {
     }
     return tc
 }
+
 
 func (bk *BookKeeper) DeleteTransferForKey(key string) {
     bk.mutex.Lock()
@@ -93,6 +95,11 @@ func (tc *TransferConnection) RenderBS(c *revelpkg.Controller, filename string) 
 func (tc *TransferConnection) ReadyReceive(c *revelpkg.Controller) revelpkg.Result {
     tc.key = <-tc.filenamePipe
     return tc.RenderBS(c, tc.key)
+}
+func GetKeyForFilename(filename string) string {
+    h := md5.New()
+    io.WriteString(h, filename)
+    return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (tc *TransferConnection) ReadySend(numChunks int64, filename string) bool{
