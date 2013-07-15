@@ -11,4 +11,4 @@ To Use:
 * Open /Receiver to download that file!!!
 
 Todo
-NOT TOO MUCH NOW
+deploy with git
