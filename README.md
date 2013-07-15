@@ -11,6 +11,4 @@ To Use:
 * Open /Receiver to download that file!!!
 
 Todo
-Alot.
-
-
+NOT TOO MUCH NOW
