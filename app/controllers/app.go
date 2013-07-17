@@ -2,7 +2,7 @@ package controllers
 
 import (
     revelpkg "github.com/robfig/revel"
-    "filetransfer/app/transfer"
+    "hailmary/app/transfer"
     "code.google.com/p/go.net/websocket"
     "strings"
     "strconv"
