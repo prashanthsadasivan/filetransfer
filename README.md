@@ -2,7 +2,6 @@ filetransfer
 ============
 
 Transfer files without intermediary storage!  An experiment with WebSockets, and Go with the [Revel] (http://robfig.github.io/revel/) framework.
-w
 
 To Use:
 
