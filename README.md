@@ -4,7 +4,6 @@ filetransfer
 Transfer files without intermediary storage!  An experiment with WebSockets, and Go with the [Revel] (http://robfig.github.io/revel/) framework.
 
 
-
 To Use:
 
 * Run the server (revel run filetransfer)
@@ -13,3 +12,5 @@ To Use:
 
 Todo
 deploy with git
+i think you can deploy with git now
+
