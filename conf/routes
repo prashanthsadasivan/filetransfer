@@ -9,7 +9,7 @@ GET     /                                               App.Index
 GET     /Receiver                                       App.Receiver
 GET     /StartReceiver                                  App.StartReceiver
 GET     /Sender                                         App.Sender
-WS     /SendChunk                                         App.SendChunk
+WS      /SendChunk                                      App.SendChunk
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
