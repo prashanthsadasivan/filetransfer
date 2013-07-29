@@ -25,6 +25,7 @@ func(c App) StartReceiver() revelpkg.Result {
 }
 
 func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
+    fmt.Printf("header: %s\n",c.Request.Header.Get("Upgrade"))
     var data []byte
     var filename string
     numChunks := int64(-1)
