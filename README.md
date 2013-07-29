@@ -5,6 +5,7 @@ Transfer files without intermediary storage!  An experiment with WebSockets, and
 
 To Use:
 
+
 * Run the server (revel run filetransfer)
 * Open /Sender  to choose a file, and click the text which says "click me"
 * Open /Receiver to download that file!!!
