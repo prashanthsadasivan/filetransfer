@@ -50,6 +50,7 @@ socket.onmessage = function(event) {
     if(msg[0]== "ready") {
         read_slice(global_file, 0)
     } else if(msg[0] == "next") {
+        console.log("sending chunk: " + msg[1])
         read_slice(global_file, parseInt(msg[1]))
     } else if(msg[0] == "end") {
         //close the websocket??
