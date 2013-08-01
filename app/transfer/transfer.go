@@ -70,6 +70,7 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
         sr.Current, done = <-sr.New
         if !done {
             if len(sr.Current) == 0 {
+                fmt.Printf("done done \n")
                 return 0, io.EOF
             }
         }
