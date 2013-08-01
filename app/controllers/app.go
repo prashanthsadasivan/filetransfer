@@ -9,7 +9,6 @@ import (
     "fmt"
 )
 
-
 type App struct {
     *revelpkg.Controller
 }
