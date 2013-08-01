@@ -62,8 +62,10 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
     n = 0;
     err = nil
     for n < lengthAsked {
+        fmt.Printf("waiting for bytes\n")
         thebyte, done := <-sr.New
         if !done {
+            fmt.Printf("no more bytes\n")
             return
         }
         p[n] = thebyte
