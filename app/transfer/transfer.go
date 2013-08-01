@@ -70,6 +70,7 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
         p[n] = thebyte
         n++
     }
+    fmt.Printf("reading %d bytes\n", n)
     return
 }
 

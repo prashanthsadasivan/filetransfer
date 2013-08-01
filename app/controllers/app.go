@@ -25,13 +25,15 @@ func(c App) StartReceiver() revelpkg.Result {
 }
 
 func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
+    fmt.Printf("connected\n")
+    websocket.Message.Send(ws, "hi")
     var data []byte
     var filename string
     numChunks := int64(-1)
     var tc *transfer.TransferConnection
     for {
         err := websocket.Message.Receive(ws, &data)
-        fmt.Printf("received msg")
+        fmt.Printf("received msg\n")
         if err != nil {
             fmt.Printf(err.Error())
             return nil
@@ -55,6 +57,7 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
 
                 } else if arr[0] == "numChunks" {
                     numChunks,err = strconv.ParseInt(arr[1], 10, 32)
+                    fmt.Printf("number of chunks: %d\n", numChunks)
                     if filename != "" {
                         key := transfer.GetKeyForFilename(filename)
                         websocket.Message.Send(ws, "key|" + key)
