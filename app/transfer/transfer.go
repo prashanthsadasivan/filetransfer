@@ -65,7 +65,7 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
         thebyte, done := <-sr.New
         if !done {
             fmt.Printf("no more bytes\n")
-            return
+            return n, io.EOF
         }
         p[n] = thebyte
         n++
