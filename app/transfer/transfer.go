@@ -10,11 +10,12 @@ import (
 )
 
 type TransferConnection struct {
-    sharedStream chan byte
+    sharedStream chan []byte
     filenamePipe chan string
     readerReady chan bool
     totalNumberOfChunks int64
     numChunksSent int64
+    filesize int64
     key string
 }
 
@@ -30,7 +31,7 @@ func (bk *BookKeeper) GetTransferForKey(key string) *TransferConnection {
     if tc == nil {
         fmt.Printf("making tc for key: %s\n", key)
         tc = new(TransferConnection)
-        tc.sharedStream = make(chan byte)
+        tc.sharedStream = make(chan []byte)
         tc.filenamePipe = make(chan string, 1)
         tc.readerReady = make(chan bool, 1)
         tc.totalNumberOfChunks = int64(0)
@@ -53,24 +54,28 @@ var (
 )
 
 type StreamReader struct {
-    New chan byte
+    New chan []byte
+    Current []byte
+    Index int
+    First bool
 }
 
 func (sr *StreamReader) Read(p []byte) (n int, err error) {
-    lengthAsked := len(p)
     n = 0;
     err = nil
-    for n < lengthAsked {
-        fmt.Printf("waiting for bytes\n")
-        thebyte, done := <-sr.New
+    if sr.Index == len(sr.Current) || sr.First{
+        sr.Index = 0;
+        sr.First = false;
+        var done bool
+        sr.Current, done = <-sr.New
         if !done {
-            fmt.Printf("no more bytes\n")
-            return n, io.EOF
+            if len(sr.Current) == 0 {
+                return 0, io.EOF
+            }
         }
-        p[n] = thebyte
-        n++
     }
-    fmt.Printf("reading %d bytes\n", n)
+    n = copy(p, sr.Current[sr.Index:])
+    sr.Index = sr.Index + n
     return
 }
 
@@ -82,13 +87,14 @@ func (tc *TransferConnection) RenderBS(c *revelpkg.Controller, filename string) 
     )
     tc.readerReady <- true
     sr := new(StreamReader)
+    sr.First = true;
     sr.New = tc.sharedStream
     c.Response.Out.Header().Set("Content-Type", "application/octet-stream")
     return &revelpkg.BinaryResult{
         Reader:   sr,
         Name:     filename,
         Delivery: "attachment",
-        Length:   tc.totalNumberOfChunks*131072, // http.ServeContent gets the length itself
+        Length:   tc.filesize, // http.ServeContent gets the length itself
         ModTime:  modtime,
     }
 }
@@ -103,17 +109,16 @@ func GetKeyForFilename(filename string) string {
     return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func (tc *TransferConnection) ReadySend(numChunks int64, filename string) bool{
+func (tc *TransferConnection) ReadySend(numChunks, fsize int64, filename string) bool{
     tc.totalNumberOfChunks = numChunks
+    tc.filesize = fsize
     tc.filenamePipe <- filename
     return <- tc.readerReady
 }
 
 func (tc *TransferConnection) SendChunk(chunk []byte) int64{
     if(tc.numChunksSent < tc.totalNumberOfChunks) {
-        for _,element := range chunk{
-            tc.sharedStream <- element
-        }
+        tc.sharedStream <- chunk
         tc.numChunksSent++;
         if tc.numChunksSent == tc.totalNumberOfChunks {
             close(tc.sharedStream)

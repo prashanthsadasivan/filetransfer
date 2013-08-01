@@ -24,12 +24,23 @@ func(c App) StartReceiver() revelpkg.Result {
     return c.Render()
 }
 
+func startTransfer(filename string, numChunks, fsize int64, ws *websocket.Conn) (tc *transfer.TransferConnection){
+    key := transfer.GetKeyForFilename(filename)
+    websocket.Message.Send(ws, "key|" + key)
+    tc = transfer.TheBookKeeper.GetTransferForKey(key)
+    tc.ReadySend(numChunks, fsize, filename)
+    websocket.Message.Send(ws, "ready|ready")
+    return
+}
+
 func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
     fmt.Printf("connected\n")
     websocket.Message.Send(ws, "hi")
     var data []byte
     var filename string
     numChunks := int64(-1)
+    fsize := int64(-1)
+
     var tc *transfer.TransferConnection
     for {
         err := websocket.Message.Receive(ws, &data)
@@ -47,25 +58,22 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
             if arr != nil && len(arr) == 2{
                 if arr[0] == "filename" {
                     filename = arr[1]
-                    if numChunks > 0 {
-                        key := transfer.GetKeyForFilename(filename)
-                        websocket.Message.Send(ws, "key|" + key)
-                        tc = transfer.TheBookKeeper.GetTransferForKey(key)
-                        tc.ReadySend(numChunks, filename)
-                        websocket.Message.Send(ws, "ready|ready")
+                    if numChunks > 0 && fsize >0 {
+                        tc = startTransfer(filename, numChunks, fsize, ws)
                     }
 
                 } else if arr[0] == "numChunks" {
                     numChunks,err = strconv.ParseInt(arr[1], 10, 32)
                     fmt.Printf("number of chunks: %d\n", numChunks)
-                    if filename != "" {
-                        key := transfer.GetKeyForFilename(filename)
-                        websocket.Message.Send(ws, "key|" + key)
-                        tc = transfer.TheBookKeeper.GetTransferForKey(key)
-                        tc.ReadySend(numChunks, filename)
-                        websocket.Message.Send(ws, "ready|ready")
+                    if filename != "" && fsize > 0{
+                        tc = startTransfer(filename, numChunks, fsize, ws)
                     }
-                } else  {
+                } else if arr[0] == "size" {
+                    fsize, err = strconv.ParseInt(arr[1], 10, 32)
+                    if filename != "" && numChunks > 0 {
+                        tc = startTransfer(filename, numChunks, fsize, ws)
+                    }
+                }else  {
                     panic("shit")
                 }
             } else {

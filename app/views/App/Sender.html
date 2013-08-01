@@ -91,6 +91,7 @@ $(
             console.log("numChunks: " + numChunks)
             socket.send("filename|" + global_file.name)
             socket.send("numChunks|" + numChunks)
+            socket.send("size|" + global_file.size)
             })
         }
  )
