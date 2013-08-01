@@ -33,7 +33,7 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
     var tc *transfer.TransferConnection
     for {
         err := websocket.Message.Receive(ws, &data)
-        fmt.Printf("received msg\n")
+        fmt.Printf("received msg: %d\n", len(data))
         if err != nil {
             fmt.Printf(err.Error())
             return nil
