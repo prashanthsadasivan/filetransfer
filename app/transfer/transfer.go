@@ -9,7 +9,6 @@ import (
     "crypto/md5"
 )
 
-
 type TransferConnection struct {
     sharedStream chan byte
     filenamePipe chan string
