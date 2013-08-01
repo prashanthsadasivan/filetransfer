@@ -64,6 +64,7 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
     for n < lengthAsked {
         thebyte, ok := <-sr.New
         if !ok {
+            fmt.Printf("error %d bytes\n", n)
             return n, io.EOF
             break;
         }
