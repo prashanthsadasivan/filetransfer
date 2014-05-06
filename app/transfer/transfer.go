@@ -7,6 +7,7 @@ import (
     "sync"
     "fmt"
     "crypto/md5"
+    "strconv"
 )
 
 type TransferConnection struct {
@@ -106,7 +107,7 @@ func (tc *TransferConnection) ReadyReceive(c *revelpkg.Controller) revelpkg.Resu
 }
 func GetKeyForFilename(filename string) string {
     h := md5.New()
-    io.WriteString(h, filename)
+    io.WriteString(h , filename + strconv.FormatInt(time.Now().Unix(), 10))
     return fmt.Sprintf("%x", h.Sum(nil))
 }
 
