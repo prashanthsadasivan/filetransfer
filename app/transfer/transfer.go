@@ -32,7 +32,7 @@ func (bk *BookKeeper) GetTransferForKey(key string) *TransferConnection {
     if tc == nil {
         fmt.Printf("making tc for key: %s\n", key)
         tc = new(TransferConnection)
-        tc.sharedStream = make(chan []byte)
+        tc.sharedStream = make(chan []byte, 5)
         tc.filenamePipe = make(chan string, 1)
         tc.readerReady = make(chan bool, 1)
         tc.totalNumberOfChunks = int64(0)
@@ -52,6 +52,7 @@ func (bk *BookKeeper) DeleteTransferForKey(key string) {
 
 var (
     TheBookKeeper BookKeeper
+    betweenReads time.Time
 )
 
 type StreamReader struct {
@@ -62,6 +63,7 @@ type StreamReader struct {
 }
 
 func (sr *StreamReader) Read(p []byte) (n int, err error) {
+    betweenReads = time.Now()
     n = 0;
     err = nil
     if sr.Index == len(sr.Current) || sr.First{

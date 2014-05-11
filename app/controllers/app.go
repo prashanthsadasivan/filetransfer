@@ -7,6 +7,7 @@ import (
     "strings"
     "strconv"
     "fmt"
+    "time"
 )
 
 type App struct {
@@ -43,8 +44,10 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
 
     var tc *transfer.TransferConnection
     for {
+        startLoopTime := time.Now()
         err := websocket.Message.Receive(ws, &data)
         fmt.Printf("received msg: %d\n", len(data))
+        fmt.Printf("time since ws recieve start: %f\n ", time.Since(startLoopTime).Seconds())
         if err != nil {
             fmt.Printf(err.Error())
             return nil
@@ -74,12 +77,12 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
                         tc = startTransfer(filename, numChunks, fsize, ws)
                     }
                 }else  {
-                    panic("shit")
+                    panic("not the correct protocol!")
                 }
             } else {
                 //if it doesn't match the protocol, just assume its data
                 if tc == nil {
-                    panic("fuck")
+                    panic("also not the correct protocol! no transferConnection available")
                 }
                 next_chunk := strconv.FormatInt(tc.SendChunk(data),10)
                 if !tc.Finished() {
@@ -93,7 +96,9 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
             if tc == nil {
                 panic("holyballs")
             }
+            sendChunkStart := time.Now()
             next_chunk := strconv.FormatInt(tc.SendChunk(data),10)
+            fmt.Printf("time to sendchunk: %f\n", time.Since(sendChunkStart).Seconds())
             if !tc.Finished() {
                 websocket.Message.Send(ws, "next|" + next_chunk)
             } else {

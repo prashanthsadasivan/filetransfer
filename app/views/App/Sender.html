@@ -27,10 +27,9 @@
 
 <script type="text/javascript">
     function read_slice(file, chunkNum) {
-        var chunk = 131072;
+        var chunk = 1048576;
         var marker = chunkNum*chunk;
         var sizeLeft = file.size - (marker) - 1;
-        //console.log("sl: " + sizeLeft + " cn: " + chunkNum)
         var sizeToUpload = sizeLeft < chunk ? sizeLeft : chunk;
         var bl = file.slice(marker, marker + sizeToUpload);
         deliver_slice(bl)
@@ -87,7 +86,7 @@ $(
             $("input[name=thefile]").trigger('click')
             });
         $("#readybtn").click(function(e) { 
-            var numChunks = (parseInt(global_file.size / 131072) + (global_file.size % 131072== 0 ? 0 : 1));
+            var numChunks = (parseInt(global_file.size / 1048576) + (global_file.size % 1048576== 0 ? 0 : 1));
             console.log("numChunks: " + numChunks)
             socket.send("filename|" + global_file.name)
             socket.send("numChunks|" + numChunks)
