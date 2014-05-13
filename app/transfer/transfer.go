@@ -1,7 +1,7 @@
 package transfer
 
 import (
-    revelpkg "github.com/robfig/revel"
+    revelpkg "github.com/revel/revel"
     "io"
     "time"
     "sync"
@@ -71,6 +71,7 @@ func (sr *StreamReader) Read(p []byte) (n int, err error) {
         sr.First = false;
         var done bool
         sr.Current, done = <-sr.New
+        fmt.Printf("stream reading\n")
         if !done {
             if len(sr.Current) == 0 {
                 fmt.Printf("done done \n")
@@ -122,7 +123,9 @@ func (tc *TransferConnection) ReadySend(numChunks, fsize int64, filename string)
 
 func (tc *TransferConnection) SendChunk(chunk []byte) int64{
     if(tc.numChunksSent < tc.totalNumberOfChunks) {
+        fmt.Printf("before sending\n")
         tc.sharedStream <- chunk
+        fmt.Printf("after sending\n")
         tc.numChunksSent++;
         if tc.numChunksSent == tc.totalNumberOfChunks {
             close(tc.sharedStream)
