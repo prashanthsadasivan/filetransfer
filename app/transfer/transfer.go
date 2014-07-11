@@ -8,6 +8,7 @@ import (
     "fmt"
     "crypto/md5"
     "strconv"
+    "net/http"
 )
 
 type TransferConnection struct {
@@ -101,6 +102,17 @@ func (tc *TransferConnection) RenderBS(c *revelpkg.Controller, filename string) 
         Delivery: "attachment",
         Length:   tc.filesize, // http.ServeContent gets the length itself
         ModTime:  modtime,
+    }
+}
+
+func (tc *TransferConnection) ReadyReceiveNonRevel(w http.ResponseWriter) {
+    tc.key = <-tc.filenamePipe
+    tc.readerReady <- true
+    w.Header().Set("Content-Type", "application/octet-stream")
+    w.Header().Set("Content-Length", strconv.FormatInt(tc.filesize, 10))
+    w.Header().Set("Content-Disposition", "attachment; filename=\"" + tc.key + "\"")
+    for part := range tc.sharedStream {
+        w.Write(part)
     }
 }
 

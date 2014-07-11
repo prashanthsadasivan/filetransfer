@@ -41,6 +41,7 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
         panic(err)
     }
     tc := startTransfer(filename, numChunks, fsize, ws)
+    fulltime := time.Now()
     data := make([]byte, 1048576)
     for {
 		startLoopTime := time.Now()
@@ -58,6 +59,7 @@ func (c App) SendChunk(ws *websocket.Conn) revelpkg.Result {
             websocket.Message.Send(ws, "next|"+next_chunk)
         } else {
             websocket.Message.Send(ws, "end|end")
+            log.Printf("total time: %f\n", time.Since(fulltime).Seconds())
         }
     }
 }

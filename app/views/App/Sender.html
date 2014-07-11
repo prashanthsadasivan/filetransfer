@@ -1,4 +1,4 @@
-{{set . "title" "Home"}}
+{{set . "title" "hailmary: send a file"}}
 {{template "header.html" .}}
 
 
@@ -27,17 +27,21 @@
 
 <script type="text/javascript">
     function read_slice(file, chunkNum) {
+        starttime = new Date().getTime();
         var chunk = 1048576;
         var marker = chunkNum*chunk;
         var sizeLeft = file.size - (marker) - 1;
         var sizeToUpload = sizeLeft < chunk ? sizeLeft : chunk;
         var bl = file.slice(marker, marker + sizeToUpload);
         deliver_slice(bl)
+        endtime = new Date().getTime();
+        console.log("end " + endtime + "\tstart " + starttime + "\ttime for slice: " + (endtime - starttime))
     }
 function deliver_slice(data)
 {
     //console.log("delivering slice" + data.size)
-    return socket.send(data);
+    ret = socket.send(data);
+    return ret;
 }
 // Create a socket
 var socket = new WebSocket('ws://'+window.location.host+'/SendChunk')
